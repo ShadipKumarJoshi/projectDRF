@@ -1,4 +1,3 @@
-from rest_framework import generics
 from .serializers import RegisterSerializer
 from .models import CustomUser
 from rest_framework.permissions import AllowAny
@@ -9,6 +8,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from rest_framework import generics, permissions
+from .serializers import UserProfileSerializer
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -49,3 +52,18 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
+
+
+class UserProfileView(RetrieveAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+class UserProfileEditView(UpdateAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
