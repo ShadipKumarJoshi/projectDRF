@@ -9,6 +9,11 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from .serializers import UserProfileSerializer
+from .serializers import PasswordResetRequestSerializer, SetNewPasswordSerializer
+
+# ------------------------------
+# Register & Logout
+# ------------------------------
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -29,6 +34,9 @@ class LogoutView(APIView):
             return Response({"error": "Invalid token or already logged out"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# ------------------------------
+# Password Change
+# ------------------------------
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -49,7 +57,25 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
+# ------------------------------
+# Password Reset
+# ------------------------------
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({"message": "If a matching account was found, a password reset link has been sent."}, status=status.HTTP_200_OK)
 
+
+class SetNewPasswordView(APIView):
+    def post(self, request):
+        serializer = SetNewPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+
+# ------------------------------
+# Profile View & Edit
+# ------------------------------
 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserProfileSerializer
@@ -64,3 +90,6 @@ class UserProfileEditView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+    
+
+

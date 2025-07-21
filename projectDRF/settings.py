@@ -104,8 +104,9 @@ REST_FRAMEWORK = {
     )
 }
 
+DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
-DEFAULT_FROM_EMAIL = 'noreply@example.com'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
