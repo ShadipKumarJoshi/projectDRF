@@ -1,20 +1,17 @@
-from rest_framework import viewsets
-from .models import CustomUser, SMEProfile
-from .serializers import CustomUserSerializer, SMEProfileSerializer
+from rest_framework import generics
+from .serializers import RegisterSerializer
+from .models import CustomUser
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
 
-class CustomUserViewSet(viewsets.ModelViewSet):
+class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-    
-
-class SMEProfileViewSet(viewsets.ModelViewSet):
-    queryset = SMEProfile.objects.all()
-    serializer_class = SMEProfileSerializer
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
     
 
 class LogoutView(APIView):
@@ -24,9 +21,8 @@ class LogoutView(APIView):
         try:
             refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"message": "Logged out successfully"}, status=status.HTTP_205_RESET_CONTENT)
-        except KeyError:
-            return Response({"error": "Refresh token not provided"}, status=status.HTTP_400_BAD_REQUEST)
-        except TokenError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            token.blacklist() 
+            return Response({"detail": "Logout successful"}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": "Invalid token or already logged out"}, status=status.HTTP_400_BAD_REQUEST)
+
